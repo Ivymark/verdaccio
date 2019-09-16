@@ -34,13 +34,17 @@ ENV PATH=$VERDACCIO_APPDIR/docker-bin:$PATH \
 
 WORKDIR $VERDACCIO_APPDIR
 
-RUN apk --no-cache add openssl dumb-init
+RUN apk --no-cache add openssl dumb-init sudo
 
 RUN mkdir -p /verdaccio/storage /verdaccio/plugins /verdaccio/conf
 
 COPY --from=builder /opt/verdaccio-build .
 
 ADD conf/docker.yaml /verdaccio/conf/config.yaml
+ADD conf/htpasswd /verdaccio/conf/htpasswd
+
+RUN echo "$VERDACCIO_USER_NAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$VERDACCIO_USER_NAME \
+    && chmod 440 /etc/sudoers.d/$VERDACCIO_USER_NAME
 
 RUN adduser -u $VERDACCIO_USER_UID -S -D -h $VERDACCIO_APPDIR -g "$VERDACCIO_USER_NAME user" -s /sbin/nologin $VERDACCIO_USER_NAME && \
     chmod -R +x $VERDACCIO_APPDIR/bin $VERDACCIO_APPDIR/docker-bin && \
@@ -50,8 +54,6 @@ RUN adduser -u $VERDACCIO_USER_UID -S -D -h $VERDACCIO_APPDIR -g "$VERDACCIO_USE
 USER $VERDACCIO_USER_UID
 
 EXPOSE $VERDACCIO_PORT
-
-VOLUME /verdaccio/storage
 
 ENTRYPOINT ["uid_entrypoint"]
 
