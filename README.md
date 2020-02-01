@@ -265,3 +265,6 @@ The Verdaccio documentation and logos (excluding /thanks, e.g., .md, .png, .sket
  [Creative Commons licensed](https://github.com/verdaccio/verdaccio/blob/master/LICENSE-docs).
 
 
+
+
+
